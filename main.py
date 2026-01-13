@@ -147,12 +147,24 @@ async def chat(request: ChatRequest):
             )
         
         # Get the last AI message as the response
-        # Not necessary just get the last message from final_messages
         response_content = ""
         for msg in reversed(final_messages):
             if isinstance(msg, AIMessage) and msg.content:
-                response_content = msg.content
-                break
+                # Handle both string content and list of content blocks
+                if isinstance(msg.content, str):
+                    response_content = msg.content
+                elif isinstance(msg.content, list):
+                    # Extract text from content blocks
+                    text_parts = []
+                    for block in msg.content:
+                        if isinstance(block, dict) and block.get('type') == 'text':
+                            text_parts.append(block.get('text', ''))
+                        elif isinstance(block, str):
+                            text_parts.append(block)
+                    response_content = '\n'.join(text_parts).strip()
+                
+                if response_content:
+                    break
         
         if not response_content:
             response_content = "I apologize, but I couldn't generate a response. Please try again."

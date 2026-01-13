@@ -19,9 +19,9 @@ def get_llm(judge: int):
     """Get LLM based on judge counter - cycles through providers on rate limits."""
     match judge:
         case 1:
-            llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash', temperature=0.7)
-        case 2:
             llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite', temperature=0.7)
+        case 2:
+            llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash', temperature=0.7)
         case 3:
             llm = ChatGoogleGenerativeAI(model='gemini-3-flash', temperature=0.7)
         case 4:

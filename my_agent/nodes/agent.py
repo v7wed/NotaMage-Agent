@@ -8,7 +8,7 @@ from my_agent.prompts import get_system_prompt
 from my_agent.tools import all_tools
 
 def get_llm():
-    llm = ChatDeepSeek(model='deepseek-chat', temperature=0)
+    llm = ChatDeepSeek(model='deepseek-chat', temperature=0.7)
     return llm
 
 

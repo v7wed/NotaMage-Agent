@@ -14,3 +14,4 @@ wheels/
 .env.example
 
 AGENT_BLUEPRINT.md
+system.txt

@@ -9,6 +9,7 @@ so the LLM doesn't need to pass it as a parameter.
 from langchain.tools import tool, ToolRuntime
 from my_agent.utils.express_client import express_client
 
+from datetime import date
 
 @tool
 async def get_user_categories(runtime: ToolRuntime) -> dict:
@@ -119,3 +120,8 @@ async def assign_notes_to_category(
         return result
     except Exception as e:
         return {"error": str(e), "success": False}
+
+
+def get_current_date() -> date:
+    """returns current date object"""
+    return date.today()

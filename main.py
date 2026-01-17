@@ -46,7 +46,7 @@ class HealthResponse(BaseModel):
 
 
 # Sliding window size for conversation history
-MAX_HISTORY_MESSAGES = 10
+MAX_HISTORY_MESSAGES = 7
 
 
 @asynccontextmanager

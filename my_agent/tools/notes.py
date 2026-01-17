@@ -162,6 +162,18 @@ async def update_note(
         result = await express_client.put(f"/api/agent/notes/{note_id}", data)
         return result
     except Exception as e:
+        error_msg = str(e).lower()
+        print(f"[UPDATE_NOTE] ERROR: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        # Provide helpful error messages
+        if "404" in error_msg or "not found" in error_msg:
+            return {
+                "error": "Note not found. The note may have been deleted or the note_id is incorrect. Try searching for the note by title first using search_user_notes.",
+                "success": False
+            }
+        
         return {"error": str(e), "success": False}
 
 

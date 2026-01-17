@@ -1,7 +1,7 @@
 """
 Agent node for The Mage - the main LLM-powered conversational node.
 """
-import time
+import asyncio
 from langchain_deepseek import ChatDeepSeek
 from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -19,11 +19,11 @@ def get_llm(judge: int):
     """Get LLM based on judge counter - cycles through providers on rate limits."""
     match judge:
         case 1:
-            llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite', temperature=0.7)
+            llm = ChatGoogleGenerativeAI(model='gemini-3-flash-preview', temperature=0.7)
         case 2:
             llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash', temperature=0.7)
         case 3:
-            llm = ChatGoogleGenerativeAI(model='gemini-3-flash', temperature=0.7)
+            llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash-lite', temperature=0.7)
         case 4:
             llm = ChatGroq(model='llama-3.3-70b-versatile', temperature=0.7)
         case _:
@@ -65,7 +65,7 @@ def is_rate_limit_error(exception: Exception) -> bool:
     return False
 
 
-def agent_node(state: MageState) -> MageState:
+async def agent_node(state: MageState) -> MageState:
     """
     Main agent node - processes user messages through the LLM with tools.
     
@@ -83,18 +83,20 @@ def agent_node(state: MageState) -> MageState:
     Returns:
         Updated state with the agent's response message
     """
+
+    
     user_name = state['user_name']
     
-    system_message = SystemMessage(content=get_system_prompt(user_name))
+    system_message = SystemMessage(content=get_system_prompt())
     messages = [system_message] + list(state["messages"])
     
     judge = 1
-    
+    response = None
 
     while judge <= MAX_PROVIDERS:
         try:
             llm = get_llm(judge).bind_tools(all_tools)
-            response = llm.invoke(messages)
+            response = await llm.ainvoke(messages)
             # Success - break out of the retry loop
             break
         except Exception as e:
@@ -102,7 +104,7 @@ def agent_node(state: MageState) -> MageState:
                 print(f"Rate limit hit on provider {judge}, switching to next provider...")
                 judge += 1
                 # Small delay before retrying with next provider
-                time.sleep(0.5)
+                await asyncio.sleep(0.5)
             else:
                 # For non-rate-limit errors, re-raise
                 raise

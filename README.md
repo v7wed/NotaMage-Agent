@@ -1,6 +1,6 @@
 <div align="left">
 
-# 🧙‍♂️ NotaMage Agent v1.0.0
+# 🧙‍♂️ NotaMage Agent v1.0.1
 
 ![Status](https://img.shields.io/badge/Status-Maintained-green?style=for-the-badge)
 
@@ -9,17 +9,17 @@
 ---
 
 ## 🎉 What's New?
-- First stable version released!
-- Multi-provider LLM fallback system for reliability
+- **v1.0.1**: Simplified to single provider (Google Gemini) for consistency
+- Graceful rate limit handling with informative user messaging
 - Autonomous tool orchestration via LangGraph
 
 ---
 
 ## 💡 About
 
-**NotaMage Agent** (aka "The Mage") is a **LangGraph agent wrapped in a FastAPI server** that powers the AI chat functionality in the main Notamage application. It features **autonomous tool calling** to perform CRUD operations on notes and categories, and uses **multiple LLM providers** (Google Gemini → Groq → DeepSeek) to gracefully handle rate limits.
+**NotaMage Agent** (aka "The Mage") is a **LangGraph agent wrapped in a FastAPI server** that powers the AI chat functionality in the main Notamage application. It features **autonomous tool calling** to perform CRUD operations on notes and categories, powered by **Google Gemini 3 Flash** (customizable).
 
-This is a private service used by the main application. You can try interacting with the agent through the chat interface in the main app.
+This is a private service used by the main application. You can try interacting with the agent through the chat interface in the main app, though please note the live demo runs on **free-tier resources with limited daily quota**.
 
 🔗 [**Main Notamage Application Repository**](https://github.com/v7wed/Notamage)
 
@@ -67,8 +67,8 @@ cd NotaMage-Agent
 # Create a system.txt file in the main directory containing your desired system prompt
 echo "Your system prompt here" > system.txt
 
-# If you have missing/different/extra API keys or want to customize providers,
-# edit agent.py get_llm() function
+# If you want to use a different provider or model,
+# edit agent.py agent_node() function
 
 # Install dependencies
 uv sync
@@ -88,15 +88,16 @@ The agent uses a **sliding window** approach to manage context:
 - Maximum history: 7 messages (configurable via `MAX_HISTORY_MESSAGES` in [main.py](main.py))
 - Automatically truncates older messages to stay within token limits
 
-### Provider Fallback
-Rate limit handling with automatic provider switching:
-1. Google Gemini 2.5 Flash Lite (primary)
-2. Google Gemini 2.5 Flash
-3. Google Gemini 3 Flash
-4. Groq Llama 3.3 70B
-5. DeepSeek Chat (fallback)
+### LLM Provider
+The agent uses **Google Gemini 3 Flash** as its sole provider for consistency and to prevent hallucination issues that can occur when switching providers mid-conversation.
 
-Configure the order or add providers in [agent.py](my_agent/nodes/agent.py) `get_llm()` function.
+**Rate Limit Handling:**
+- Automatically detects rate limit errors (429, quota exceeded, etc.)
+- Returns a professional, informative message explaining the demo's limitations
+- Maintains user experience even when quota is exhausted
+- You can modify how rate limiting is handled in the agent_node in [agent.py](my_agent/nodes/agent.py).
+
+You can also modify the model or provider in [agent.py](my_agent/nodes/agent.py) make sure you configure your api keys in the enviroment variables.
 
 ---
 

@@ -62,7 +62,7 @@ async def agent_node(state: MageState) -> MageState:
     messages = [system_message] + list(state["messages"])
     
     try:
-        llm = ChatGoogleGenerativeAI(model='gemini-2.5-flash', temperature=0.7)
+        llm = ChatGoogleGenerativeAI(model='gemini-3-flash-preview', temperature=0.7)
         llm_with_tools = llm.bind_tools(all_tools)
         response = await llm_with_tools.ainvoke(messages)
     except Exception as e:
